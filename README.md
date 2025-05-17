@@ -1,54 +1,40 @@
-# React + TypeScript + Vite
+# Implementation Approach
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This multi-step form solution was built with **React**, **TypeScript**, and **Shadcn UI**, prioritizing type safety, modularity, and user experience. Here’s how I tackled it:
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Dynamic Architecture
 
-## Expanding the ESLint configuration
+- Fields are configured in a **centralized array** with **Zod validation schemas**
+- **Total steps** are calculated dynamically from the `page` property of fields
+- **Form state and validation** are managed via **react-hook-form + Zod** integration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## UI/UX Focus
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Implemented **responsive dark/light mode** with **persistent local storage**
+- Added **animated success feedback** and **accessible labels**
+- Designed a **progress stepper** that auto-updates based on steps
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Key Features
+
+- **Smart Validation**: Only validates current step fields
+- **Reusable Components**: `FormField` dynamically renders inputs based on type
+- **Error Handling**: Zod provides clear, contextual error messages
+- **Security**: Password matching via schema refinement
+
+---
+
+## Extensibility
+
+- Fields can be added/removed by modifying the **fields array**
+- New input types supported by **extending `FormField` logic**
+- **Theme system** allows easy visual customization
+
+---
+
+> The solution balances **developer experience** (clean, type-safe code) with **end-user experience** (smooth navigation, clear feedback).

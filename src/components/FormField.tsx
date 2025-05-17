@@ -1,5 +1,5 @@
 import { useFormContext } from "react-hook-form";
-import { type FieldConfig } from "../fields";
+import type { FieldConfig } from "../fields";
 import {
   FormControl,
   FormItem,
@@ -18,25 +18,80 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar"; 
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export const FormField: React.FC<{ field: FieldConfig }> = ({ field }) => {
   const form = useFormContext();
 
   return (
     <FormFieldPrimitive
-      {...form}
+      control={form.control}
       name={field.name}
       render={({ field: controllerField, fieldState }) => (
-        <FormItem className="space-y-1">
+        <FormItem className="space-y-1 flex flex-col">
           <FormLabel className="gap-1">
             {field.label}
             {field.required && <span className="text-destructive">*</span>}
           </FormLabel>
 
-          {field.type === "select" ? (
+          {field.type === "radio" ? (
+            <RadioGroup
+              onValueChange={controllerField.onChange}
+              value={controllerField.value}
+              className="flex flex-col space-y-1"
+            >
+              {field.options?.map((option) => (
+                <div className="flex items-center space-x-2" key={option.value}>
+                  <RadioGroupItem value={option.value} id={option.value} />
+                  <label htmlFor={option.value} className="text-sm font-medium">
+                    {option.label}
+                  </label>
+                </div>
+              ))}
+            </RadioGroup>
+          ) : field.type === "date" ? (
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {controllerField.value ? (
+                      format(controllerField.value, "PPP")
+                    ) : (
+                      <span>{field.placeholder || "Pick a date"}</span>
+                    )}
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={controllerField.value}
+                  onSelect={controllerField.onChange}
+                  initialFocus
+                  disabled={(date) =>
+                    date > new Date() || date < new Date("1900-01-01")
+                  }
+                />
+              </PopoverContent>
+            </Popover>
+          ) : field.type === "select" ? (
             <Select
               {...controllerField}
               onValueChange={controllerField.onChange}
+              value={controllerField.value}
             >
               <FormControl>
                 <SelectTrigger>
@@ -54,12 +109,19 @@ export const FormField: React.FC<{ field: FieldConfig }> = ({ field }) => {
               </SelectContent>
             </Select>
           ) : field.type === "textarea" ? (
-            <Textarea {...controllerField} placeholder={field.placeholder} />
-          ) : field.type === "checkbox" ? (
-            <Checkbox
-              checked={controllerField.value}
-              onCheckedChange={controllerField.onChange}
+            <Textarea
+              {...controllerField}
+              placeholder={field.placeholder}
+              maxLength={200}
             />
+          ) : field.type === "checkbox" ? (
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={controllerField.value}
+                onCheckedChange={controllerField.onChange}
+              />
+              <span className="text-sm">{field.description}</span>
+            </div>
           ) : (
             <Input
               type={field.type}
@@ -68,7 +130,7 @@ export const FormField: React.FC<{ field: FieldConfig }> = ({ field }) => {
             />
           )}
 
-          {field.description && (
+          {field.description && field.type !== "checkbox" && (
             <FormDescription>{field.description}</FormDescription>
           )}
 

@@ -13,6 +13,7 @@ export interface FieldConfig {
 }
 
 export const fields: FieldConfig[] = [
+  // Page 1: Basic Information (4 fields)
   {
     name: "firstName",
     label: "First Name",
@@ -22,6 +23,15 @@ export const fields: FieldConfig[] = [
     validation: z.string().min(1, "First name is required"),
     page: 1,
     required: true,
+  },
+  {
+    name: "middleName",
+    label: "Middle Name",
+    type: "text",
+    placeholder: "Middle",
+    description: "Your middle name (optional)",
+    validation: z.string().optional(),
+    page: 1,
   },
   {
     name: "lastName",
@@ -34,13 +44,27 @@ export const fields: FieldConfig[] = [
     required: true,
   },
   {
+    name: "dob",
+    label: "Date of Birth",
+    type: "date",
+    description: "Your date of birth",
+    validation: z.coerce
+      .date()
+      .min(new Date("1900-01-01"), "Date is too far in the past")
+      .max(new Date(), "Date cannot be in the future"),
+    page: 1,
+    required: true,
+  },
+
+  // Page 2: Contact Information (4 fields)
+  {
     name: "email",
     label: "Email",
     type: "email",
     placeholder: "john@example.com",
     description: "We'll never share your email",
     validation: z.string().email("Invalid email format"),
-    page: 1,
+    page: 2,
     required: true,
   },
   {
@@ -54,9 +78,26 @@ export const fields: FieldConfig[] = [
       .min(10, "Must be at least 10 digits")
       .regex(/^[0-9+ ]+$/, "Invalid phone format")
       .optional(),
-    page: 1,
+    page: 2,
+  },
+  {
+    name: "gender",
+    label: "Gender",
+    type: "radio",
+    options: [
+      { label: "Male", value: "M" },
+      { label: "Female", value: "F" },
+      { label: "Prefer not to say", value: "NA" },
+    ],
+    validation: z.enum(["M", "F", "NA"], {
+      errorMap: () => ({ message: "Please select a gender" }),
+    }),
+    page: 2,
+    required: true,
+    description: "Select your gender",
   },
 
+  // Page 3: Address Information (6 fields)
   {
     name: "address",
     label: "Street Address",
@@ -64,8 +105,17 @@ export const fields: FieldConfig[] = [
     placeholder: "123 Main St",
     description: "Your street address",
     validation: z.string().min(1),
-    page: 2,
+    page: 3,
     required: true,
+  },
+  {
+    name: "apartment",
+    label: "Apartment/Suite",
+    type: "text",
+    placeholder: "Apt 4B",
+    description: "Apartment, suite, or unit number",
+    validation: z.string().optional(),
+    page: 3,
   },
   {
     name: "city",
@@ -74,7 +124,17 @@ export const fields: FieldConfig[] = [
     placeholder: "New York",
     description: "Your city",
     validation: z.string().min(1),
-    page: 2,
+    page: 3,
+    required: true,
+  },
+  {
+    name: "state",
+    label: "State/Province",
+    type: "text",
+    placeholder: "e.g. California",
+    description: "Enter your state or province",
+    validation: z.string().min(1, "State/Province is required"),
+    page: 3,
     required: true,
   },
   {
@@ -87,7 +147,7 @@ export const fields: FieldConfig[] = [
       .string()
       .min(5, "Must be at least 5 characters")
       .regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP format"),
-    page: 2,
+    page: 3,
     required: true,
   },
   {
@@ -103,10 +163,11 @@ export const fields: FieldConfig[] = [
       { label: "United States", value: "US" },
       { label: "Other", value: "OTHER" },
     ],
-    page: 2,
+    page: 3,
     required: true,
   },
 
+  // Page 4: Account Security (4 fields)
   {
     name: "username",
     label: "Username",
@@ -114,7 +175,36 @@ export const fields: FieldConfig[] = [
     placeholder: "johndoe",
     description: "Your unique username",
     validation: z.string().min(3),
-    page: 3,
+    page: 4,
+    required: true,
+  },
+  {
+    name: "securityQuestion",
+    label: "Security Question",
+    type: "select",
+    options: [
+      { label: "What was the name of your first pet?", value: "pet" },
+      { label: "What city were you born in?", value: "city" },
+      { label: "What was your childhood nickname?", value: "nickname" },
+    ],
+    validation: z.enum(["pet", "city", "nickname"], {
+      errorMap: () => ({ message: "Please select a security question" }),
+    }),
+    page: 4,
+    required: true,
+    description: "Choose a security question for account recovery",
+  },
+  {
+    name: "securityAnswer",
+    label: "Security Answer",
+    type: "text",
+    placeholder: "Enter your answer...",
+    description: "Answer to your security question",
+    validation: z
+      .string()
+      .min(2, "Answer must be at least 2 characters")
+      .max(50, "Answer cannot exceed 50 characters"),
+    page: 4,
     required: true,
   },
   {
@@ -124,7 +214,7 @@ export const fields: FieldConfig[] = [
     placeholder: "••••••••",
     description: "Must be at least 6 characters",
     validation: z.string().min(6),
-    page: 3,
+    page: 4,
     required: true,
   },
   {
@@ -134,21 +224,19 @@ export const fields: FieldConfig[] = [
     placeholder: "••••••••",
     description: "Confirm your password",
     validation: z.string().min(6, "Password must be at least 6 characters"),
-    page: 3,
+    page: 4,
     required: true,
   },
 
+  // Page 5: Additional Info & Agreements (3 fields)
   {
     name: "bio",
     label: "Short Bio",
     type: "textarea",
     placeholder: "Tell us about yourself...",
     description: "Max 200 characters",
-    validation: z
-      .string()
-      .max(200, "Maximum 200 characters allowed")
-      .optional(),
-    page: 4,
+    validation: z.string().max(200).optional(),
+    page: 5,
   },
   {
     name: "subscribe",
@@ -156,17 +244,14 @@ export const fields: FieldConfig[] = [
     type: "checkbox",
     description: "Subscribe to our newsletter",
     validation: z.boolean().optional(),
-    page: 4,
+    page: 5,
   },
-
   {
     name: "terms",
     label: "Accept Terms & Conditions",
     type: "checkbox",
     description: "Accept our terms and conditions",
-    validation: z.literal(true, {
-      errorMap: () => ({ message: "You must accept the terms" }),
-    }),
+    validation: z.literal(true),
     page: 5,
     required: true,
   },
